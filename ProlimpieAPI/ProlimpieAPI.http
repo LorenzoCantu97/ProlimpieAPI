@@ -1,0 +1,6 @@
+@ProlimpieAPI_HostAddress = http://localhost:5152
+
+GET {{ProlimpieAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
