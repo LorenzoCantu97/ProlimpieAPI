@@ -2,10 +2,10 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using ProlimpieAPI.Models.DTO;
+using ProlimpieAPI.Models.SysAdmin;
+using ProlimpieAPI.Models._DTO.Auth;
 
 namespace ProlimpieAPI.Controllers
 {
@@ -13,15 +13,18 @@ namespace ProlimpieAPI.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AuthController(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager )
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         [HttpPost("login")]
@@ -46,22 +49,46 @@ namespace ProlimpieAPI.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ESTA_ES_UNA_LLAVE_SUPER_SECRETA_12345"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new List<Claim>
+            var claimsJWT = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email ?? "")
             };
 
             var roles = await _userManager.GetRolesAsync(user);
             foreach(var role in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claimsJWT.Add(new Claim(ClaimTypes.Role, role));
+
+                var roleEntity = await _roleManager.FindByNameAsync(role);
+                if (roleEntity != null)
+                {
+                    var roleClaims = await _roleManager.GetClaimsAsync(roleEntity);
+                    foreach (var rc in roleClaims)
+                    {
+                        if (!claimsJWT.Any(c => c.Type == rc.Type && c.Value == rc.Value))
+                        {
+                            claimsJWT.Add(rc);
+                        }
+                    }
+                }
+            }
+            
+            var claims = await _userManager.GetClaimsAsync(user);
+            foreach(var uc in claims)
+            {
+                if (!claimsJWT.Any(c => c.Type == uc.Type && c.Value == uc.Value))
+                {
+                    claimsJWT.Add(uc);
+                }
             }
 
             var token = new JwtSecurityToken(
-                claims: claims,
+                //issuer: "API",
+                //audience: "REACT",
+                claims: claimsJWT,
                 expires: DateTime.Now.AddHours(2),
                 signingCredentials: creds
             );
@@ -71,14 +98,8 @@ namespace ProlimpieAPI.Controllers
             return Ok(new
             {
                 sucess = true,
-                message = "Bienvenido de vuelta",
+                message = "login exitoso",
                 token = tokenString,
-                user = new
-                {
-                    id = user.Id,
-                    email = user.Email,
-                    roles = roles
-                }
             });
         }
     }
