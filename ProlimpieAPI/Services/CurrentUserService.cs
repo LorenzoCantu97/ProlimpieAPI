@@ -12,16 +12,16 @@ namespace ProlimpieAPI.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string UserId
+        public int UserId
         {
             get
             {
                 var userId = _httpContextAccessor.HttpContext?
                     .User?
-                    .FindFirst(ClaimTypes.NameIdentifier)?
+                    .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?
                     .Value;
 
-                return userId != null ? userId : string.Empty;
+                return int.TryParse(userId, out var id) ? id : 0;
             }
         }
     }

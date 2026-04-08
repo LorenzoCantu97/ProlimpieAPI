@@ -7,9 +7,9 @@ namespace ProlimpieAPI.Models.General.Entidades
     {
         public int Id { get; set; }
         public required int TiposEntidadesId { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

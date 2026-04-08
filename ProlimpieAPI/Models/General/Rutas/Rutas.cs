@@ -11,9 +11,9 @@ namespace ProlimpieAPI.Models.General.Rutas
         public required string UsuariosId_Delegado { get; set; }
         public required int StatusId { get; set; }
         public required int TiposRutasId { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

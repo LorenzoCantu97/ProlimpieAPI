@@ -10,9 +10,9 @@ namespace ProlimpieAPI.Models.General.Ubicaciones
         public required int PaisesId { get; set; }
         public required string CodigoLada { get; set; }
         public required bool Activo { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

@@ -9,9 +9,9 @@ namespace ProlimpieAPI.Models.Inventarios
         public required string Nombre { get; set; }
         public required int Cantidad { get; set; }
         public required int UnidadesMedidasId { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

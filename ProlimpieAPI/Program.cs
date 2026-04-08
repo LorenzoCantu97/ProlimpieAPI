@@ -6,6 +6,7 @@ using ProlimpieAPI.Data;
 using ProlimpieAPI.Interfaces;
 using ProlimpieAPI.Models.SysAdmin;
 using ProlimpieAPI.Services;
+using ProlimpieAPI.Services.sysAdmin;
 using System.Security.Claims;
 using System.Text;
 
@@ -22,7 +23,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -60,6 +61,10 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddScoped<IAccesosService, AccesosService>();
+builder.Services.AddScoped<IHistorialService, HistorialService>();
+builder.Services.AddScoped<IPermisosService, PermisosService>();
+builder.Services.AddScoped<IRolesService, RolesService>();
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
@@ -81,7 +86,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// CREAR USUARIOS DE PRUEBA PARA PRUEBAS
+// IMPORTANTE COMENTAR ESTA SECCION DESPUES DE LA PRIMERA EJECUCION PARA NO ELIMINAR USUARIOS Y ROLES CREADOS
+// CREAR USUARIO ADMINISTRADOR
 //using (var scope = app.Services.CreateScope())
 //{
 //    await IdentitySeeder.DeleteAndCreateRolesAndUsers(scope.ServiceProvider);
@@ -114,9 +120,9 @@ public static class IdentitySeeder
             SucursalesEmpresasId = 0,
             EntidadesId = 0,
             Activo = true,
-            CreatedById = string.Empty,
+            CreatedById = null,
             CreatedAt = DateTime.Now,
-            UpdatedById = string.Empty,
+            UpdatedById = null,
             UpdatedAt = DateTime.Now,
         },
         //new IdentityUser { UserName = "sistemas",  Email = "sistemas@prueba.com",  EmailConfirmed = true },
@@ -133,7 +139,17 @@ public static class IdentitySeeder
     public static async Task DeleteAndCreateRolesAndUsers(IServiceProvider serviceProvider)
     {
         var userManager = serviceProvider.GetRequiredService <UserManager<ApplicationUser>>();
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+        var context = serviceProvider.GetRequiredService<AppDbContext>();
+
+        if (!context.Modulos.Any())
+        {
+            context.Modulos.AddRange(
+                new Modulos { Nombre = "SysAdmin", Descripcion = "Módulo de administración del sistema" }
+            );
+
+            await context.SaveChangesAsync();
+        }
 
         // ELIMINAR USUARIOS
         var users = userManager.Users.ToList();
@@ -153,7 +169,14 @@ public static class IdentitySeeder
         foreach(var rol in rolesArr)
         {
             if (!await roleManager.RoleExistsAsync(rol))
-                await roleManager.CreateAsync(new IdentityRole(rol));
+                await roleManager.CreateAsync(new ApplicationRole
+                {
+                    Name = rol,
+                    CreatedById = null,
+                    CreatedAt = DateTime.Now,
+                    UpdatedById = null,
+                    UpdatedAt = DateTime.Now
+                });
         }
 
         // CREAR USUARIOS Y APLICAR ROLES
@@ -171,34 +194,39 @@ public static class IdentitySeeder
                         case "admin":
                             await userManager.AddToRoleAsync(user, "Administrador");
                             // PERMISOS PARA ADMIN
-                            var claims = new List<Claim>
+                            var claims = new List<ApplicationUserClaim>
                             {
-                                new Claim("Permiso", "Usuarios.Crear"),
-                                new Claim("Permiso", "Usuarios.Borrar"),
-                                new Claim("Permiso", "Usuarios.Editar"),
-                                new Claim("Permiso", "Roles.Crear"),
-                                new Claim("Permiso", "Roles.Borrar"),
-                                new Claim("Permiso", "Roles.Editar"),
-                                new Claim("Permiso", "Accesos.Crear"),
-                                new Claim("Permiso", "Accesos.Borrar"),
-                                new Claim("Permiso", "Accesos.Editar"),
-                                new Claim("Permiso", "Permisos.Crear"),
-                                new Claim("Permiso", "Permisos.Borrar"),
-                                new Claim("Permiso", "Permisos.Editar"),
-                                new Claim("Acceso", "SysAdmin"),
-                                new Claim("Acceso", "SysAdmin.Usuarios"),
-                                new Claim("Acceso", "SysAdmin.Roles"),
-                                new Claim("Acceso", "SysAdmin.Accesos"),
-                                new Claim("Acceso", "SysAdmin.Permisos"),
-                                new Claim("Acceso", "SysAdmin.Historial")
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Usuarios.Crear", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Usuarios.Borrar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Usuarios.Editar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Roles.Crear", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Roles.Borrar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Roles.Editar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Accesos.Crear", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Accesos.Borrar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Accesos.Editar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Permisos.Crear", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Permisos.Borrar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Permiso", ClaimValue = "Permisos.Editar", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Acceso", ClaimValue = "SysAdmin", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Acceso", ClaimValue = "SysAdmin.Usuarios", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Acceso", ClaimValue = "SysAdmin.Roles", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Acceso", ClaimValue = "SysAdmin.Accesos", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Acceso", ClaimValue = "SysAdmin.Permisos", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now},
+                                new ApplicationUserClaim{ ModulosId = 1, ClaimType = "Acceso", ClaimValue = "SysAdmin.Historial", CreatedById = null, CreatedAt = DateTime.Now, UpdatedById = null, UpdatedAt = DateTime.Now}
                             };
                             foreach (var claim in claims)
                             {
-                                if (!(await userManager.GetClaimsAsync(user)).Any(c => c.Type == claim.Type && c.Value == claim.Value))
+                                if (!context.UserClaims.Any(c =>
+                                    c.UserId == user.Id &&
+                                    c.ClaimType == claim.ClaimType &&
+                                    c.ClaimValue == claim.ClaimValue))
                                 {
-                                    await userManager.AddClaimAsync(user, claim);
+                                    claim.UserId = user.Id;
+                                    context.UserClaims.Add(claim);
                                 }
                             }
+                            await context.SaveChangesAsync();
                             break;
                         case "sistemas":
                             await userManager.AddToRoleAsync(user, "Sistemas");

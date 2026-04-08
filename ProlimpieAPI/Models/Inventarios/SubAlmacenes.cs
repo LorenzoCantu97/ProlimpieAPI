@@ -1,22 +1,23 @@
-﻿using ProlimpieAPI.Interfaces;
-using ProlimpieAPI.Models.General.Entidades;
+﻿using ProlimpieAPI.Models.General.Entidades;
 using ProlimpieAPI.Models.SysAdmin;
 
-namespace ProlimpieAPI.Models.General.Direcciones
+namespace ProlimpieAPI.Models.Inventarios
 {
-    public class EntidadesDirecciones : IAuditable
+    public class SubAlmacenes
     {
-        public int Id { get; set; }
+        public int Id { get; set;  }
+        public required string Nombre { get; set; }
         public required int EntidadesId { get; set; }
-        public required int DireccionesId { get; set; }
+        public required int AlmacenesId { get; set; }
+        public required bool Activo { get; set; }
         public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
         public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación
-        public required Entidades.Entidades Entidad { get; set; }
-        public required Direcciones Direccion { get; set; }
+        public required Entidades Entidad { get; set; } 
+        public required Almacenes Almacen { get; set; }
         public ApplicationUser? CreatedBy { get; set; }
         public ApplicationUser? UpdatedBy { get; set; }
     }

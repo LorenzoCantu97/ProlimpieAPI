@@ -10,9 +10,9 @@ namespace ProlimpieAPI.Models.General.Rutas
         public required int DireccionesId { get; set; }
         public required int Orden { get; set; }
         public required DateTime HoraEstimada { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

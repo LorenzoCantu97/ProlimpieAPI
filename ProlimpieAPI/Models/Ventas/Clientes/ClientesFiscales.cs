@@ -16,9 +16,9 @@ namespace ProlimpieAPI.Models.Ventas.Clientes
         public required int UsosCFDIId { get; set; }
         public required int FormasPagoId { get; set; }
         public required int MetodosPagosId { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

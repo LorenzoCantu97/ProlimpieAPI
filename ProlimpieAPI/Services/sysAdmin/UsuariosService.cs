@@ -2,7 +2,7 @@
 using ProlimpieAPI.Data;
 using ProlimpieAPI.Models._DTO.SysAdmin;
 
-namespace ProlimpieAPI.Services
+namespace ProlimpieAPI.Services.sysAdmin
 {
     public interface IUsuariosService
     {
@@ -34,7 +34,9 @@ namespace ProlimpieAPI.Services
                     FechaNacimiento = user.FechaNacimiento,
                     FechaIngreso = user.FechaIngreso,
                     SucursalesEmpresasId = user.SucursalesEmpresasId,
-                    Activo = user.Activo
+                    Activo = user.Activo,
+                    CreatedBy = user.CreatedBy != null ? user.CreatedBy.Nombre : null,
+                    UpdatedBy = user.UpdatedBy != null ? user.UpdatedBy.Nombre : null
                 })
                 .ToListAsync();
         }

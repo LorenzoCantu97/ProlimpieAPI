@@ -1,13 +1,23 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProlimpieAPI.Interfaces;
 using ProlimpieAPI.Models.General.Empresa;
 using ProlimpieAPI.Models.General.Entidades;
 using ProlimpieAPI.Models.SysAdmin;
+using System.Reflection.Emit;
 
 namespace ProlimpieAPI.Data
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext : IdentityDbContext<ApplicationUser,
+        ApplicationRole,
+        int,
+        ApplicationUserClaim,
+        IdentityUserRole<int>,
+        IdentityUserLogin<int>,
+        ApplicationRoleClaim,
+        IdentityUserToken<int>
+    >
     {
         private readonly ICurrentUserService _currentUserService;
 
@@ -21,6 +31,8 @@ namespace ProlimpieAPI.Data
 
         #region TABLAS
         public DbSet<Empresas> Empresas { get; set; }
+        public DbSet<Modulos> Modulos { get; set; }
+        public DbSet<Historial> Historial { get; set; }
         #endregion TABLAS
 
         #region CONFIGURACIONES
@@ -67,10 +79,94 @@ namespace ProlimpieAPI.Data
                 .HasForeignKey(u => u.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<ApplicationRole>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            builder.Entity<ApplicationRole>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ApplicationRoleClaim>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ApplicationRoleClaim>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ApplicationUserClaim>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ApplicationUserClaim>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Empresas>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Empresas>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Entidades>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Entidades>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Entidades>()
                 .HasOne(e => e.TiposEntidades)
                 .WithMany(t => t.Entidades)
                 .HasForeignKey(e => e.TiposEntidadesId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TiposEntidades>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TiposEntidades>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SucursalesEmpresas>()
+                .HasOne(e => e.CreatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SucursalesEmpresas>()
+                .HasOne(e => e.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

@@ -8,9 +8,9 @@ namespace ProlimpieAPI.Models.General
         public int Id { get; set; }
         public required string Nombre { get; set; }
         public required int DiasCredito { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

@@ -8,9 +8,9 @@ namespace ProlimpieAPI.Models.General.Telefonos
         public int Id { get; set; }
         public required int EntidadesId { get; set; }
         public required int TelefonosId { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación

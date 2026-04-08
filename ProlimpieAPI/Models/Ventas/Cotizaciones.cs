@@ -19,9 +19,9 @@ namespace ProlimpieAPI.Models.Ventas
         public required int VigenciasId { get; set; }
         public required int PrioridadesId { get; set; }
         public required int StatusId { get; set; }
-        public string? CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public string? UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
         public required DateTime UpdatedAt { get; set; }
 
         // Relaciones de navegación
