@@ -28,7 +28,9 @@ namespace ProlimpieAPI.Services.sysAdmin
             {
                 Id = x.historial.Id,
                 Modulo = x.historial.Modulo != null ? x.historial.Modulo.Nombre : string.Empty,
+                Pagina = x.historial.Pagina != null ? x.historial.Pagina.Nombre : string.Empty,
                 Action = x.historial.Action,
+                UserName = x.createdUser != null ? x.createdUser.Nombre : string.Empty,
                 Timestamp = x.historial.Timestamp,
             })
             .ToListAsync();
